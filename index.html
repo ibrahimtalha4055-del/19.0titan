@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TITAN V19.0 - HYPER FIX</title>
+    <style>
+        /* --- HYPER FIX TEMASI VE KUSURSUZ ÇALIŞMA STİLLERİ --- */
+        :root {
+            --bg-dark: #0A0A10; /* Ultra Koyu Arka Plan */
+            --card-dark: #1C1C24; /* Kart Arka Planı */
+            --text-light: #F8F8FF; /* Saf Beyaz Metin */
+            --blue-quantum: #00BFFF; /* Parlak Mavi Aksan (Neon) */
+            --red-alert: #FF4545; /* Kırmızı Alarm */
+            --yellow-warn: #FFD700; /* Altın Sarı Uyarı */
+            --green-safe: #3CB371; /* Deniz Yeşili Güvenli */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; /* Mobil tıklama gecikmesini ve arka plan vurgusunu önler */
+            font-family: var(--font-family); 
+            transition: all 0.2s ease-out; /* Yumuşak Geçiş */
+        }
+        body { 
+            margin: 0; 
+            background: var(--bg-dark); 
+            color: var(--text-light); 
+            overflow-x: hidden; 
+            font-size: 16px; 
+            line-height: 1.5;
+        }
+        .app { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            background: var(--bg-dark); 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); 
+        }
+        .hidden { display: none !important; }
+
+        /* HEADER & AVATAR */
+        .header { 
+            padding: 30px 20px 20px; 
+            background: var(--card-dark); 
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1); 
+            text-align: center; 
+            position: relative; 
+            border-radius: 0 0 20px 20px;
+        }
+        #settings-icon { 
+            position: absolute; 
+            top: 25px; 
+            right: 20px; 
+            font-size: 24px; 
+            color: var(--blue-quantum); 
+            cursor: pointer; 
+        }
+        .avatar { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin-bottom: 10px; 
+            border: 4px solid var(--blue-quantum);
+            box-shadow: 0 0 15px var(--blue-quantum);
+        }
+        .user-name { font-size: 32px; font-weight: 900; margin: 0; }
+        .risk-badge { 
+            display: inline-block; 
+            padding: 8px 18px; 
+            border-radius: 25px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            margin-top: 8px; 
+            color: var(--bg-dark); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .risk-badge.risk-red { background: var(--red-alert); }
+        .risk-badge.risk-yellow { background: var(--yellow-warn); }
+        .risk-badge.risk-green { background: var(--green-safe); }
+        #timer-display { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--yellow-warn); 
+            position: absolute; 
+            top: 25px; 
+            left: 20px; 
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* İÇERİK & KARTLAR */
+        .content { padding: 20px; flex: 1; padding-bottom: 80px; }
+        .card { 
+            background: var(--card-dark); 
+            padding: 18px; 
+            border-radius: 18px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+        .card.alert { background: #351010; border-left: 5px solid var(--red-alert); }
+        .card.bmi { background: #353510; border-left: 5px solid var(--yellow-warn); }
+        .lbl { display: block; font-size: 13px; font-weight: 600; color: #999; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .val { font-size: 18px; font-weight: 500; color: var(--text-light); }
+        .tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { 
+            display: inline-block; 
+            padding: 6px 12px; 
+            background: var(--red-alert); 
+            color: white; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            font-weight: 600;
+        }
+
+        /* TRİAJ KUTUSU */
+        .triage-box { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--card-dark); 
+            padding: 20px; 
+            border-radius: 18px; 
+            margin-bottom: 20px; 
+            border-left: 5px solid var(--blue-quantum);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .triage-info span { font-size: 16px; font-weight: 700; color: var(--text-light); }
+        .triage-info small { display: block; color: #aaa; margin-top: 4px; font-size: 13px; }
+        .triage-score { 
+            font-size: 48px; 
+            font-weight: 900; 
+            color: var(--blue-quantum); 
+            animation: score-pulse 2s infinite ease-out;
+        }
+        @keyframes score-pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* EKG Simülasyon Stili */
+        .card.ekg { background: #000; border: none; padding: 0; overflow: hidden; }
+        .ekg-line { 
+            display: block; 
+            height: 70px; 
+            /* SVG kodunda stroke renkleri ve çizgiler kusursuz çalışacak şekilde ayarlandı */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,10 L10,10 L12,18 L14,2 L16,10 L25,10" stroke="%233CB371" fill="none" stroke-width="0.3"/></svg>') repeat-x; 
+            background-size: 25% 100%;
+            animation: ekg-move 1.5s linear infinite;
+        }
+        .ekg-line.arrhythmia { 
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0,10 L5,10 L8,15 L10,5 L12,10 L15,10 L17,13 L19,7 L21,10 L30,10" stroke="%23FF4545" fill="none" stroke-width="0.3"/></svg>') repeat-x; 
+            background-size: 30% 100%; 
+            animation-duration: 0.8s; 
+        }
+        .ekg-title { padding: 10px 18px; font-size: 13px; color: var(--green-safe); font-weight: 700; }
+        @keyframes ekg-move { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+
+        /* BUTONLAR (ÇALIŞMA GARANTİLİ RİPPLE ETKİSİ) */
+        .q-btn, .ai-btn, .sos-btn-float { 
+            border: none; 
+            padding: 14px 18px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            color: var(--bg-dark); 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+            transition: transform 0.1s, box-shadow 0.2s, background 0.1s; /* Hızlı Geri Bildirim */
+            text-align: center;
+            display: block; 
+            text-decoration: none; 
+        }
+        /* Tuş basıldığında anlık geri bildirim için aktif durum */
+        .q-btn:active, .ai-btn:active, .sos-btn-float:active { 
+            transform: scale(0.97); 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        /* Devre dışı bırakıldığında tuş stilini ayarla */
+        .q-btn:disabled, .ai-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .q-btn { 
+            background: var(--card-dark); 
+            color: var(--text-light); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            font-size: 15px;
+            box-shadow: none;
+        }
+        .q-btn:hover { background: #2A2A35; }
+
+        .ai-btn { 
+            width: 100%; 
+            margin-top: 15px; 
+            background: var(--green-safe); 
+            color: var(--bg-dark); 
+            font-size: 18px; 
+            font-weight: 900; 
+        }
+        
+        /* SOS ve NFC Modu */
+        .sticky-sos { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 15px 20px; 
+            background: var(--bg-dark); 
+            max-width: 500px; 
+            margin: 0 auto; 
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000; /* En üstte olmasını sağlar */
+        }
+        .sos-btn-float { 
+            width: 100%; 
+            background: var(--red-alert); 
+            color: white; 
+            padding: 18px; 
+            font-size: 20px; 
+            border-radius: 15px; 
+        }
+        
+        body.sos-active { 
+            animation: sos-flash 0.2s infinite alternate; 
+            background: var(--red-alert) !important;
+        }
+        @keyframes sos-flash { from { background: var(--bg-dark); } to { background: var(--red-alert); } }
+        
+        /* ... Diğer CSS stilleri (Form, Güvenlik, Chat) aynı kalmıştır ... */
+        .login-screen, .form-group { padding: 0 20px; }
+        .login-screen h2 { color: var(--blue-quantum); }
+        .input-lg { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 8px; 
+            font-size: 16px; 
+            background: #252530; 
+            color: var(--text-light); 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        textarea.input-lg { resize: vertical; }
+        .fam-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .fam-input-group input { flex: 1; }
+        .chk-list label { display: block; margin-bottom: 10px; font-size: 15px; }
+        
+        /* GÜVENLİK EKRANI */
+        #scr-security { background: rgba(0, 0, 0, 0.98); position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 2000; }
+        .fingerprint-icon { font-size: 120px; margin-bottom: 30px; animation: pulse 1.5s infinite; color: var(--blue-quantum); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 191, 255, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(0, 191, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 191, 255, 0); } }
+        
+        /* AI CHAT STİLLERİ */
+        .chat-body { display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 12px 15px; border-radius: 15px; max-width: 85%; }
+        .msg.bot { background: var(--card-dark); color: var(--text-light); border-bottom-left-radius: 5px; align-self: flex-start; }
+        .msg.user { background: var(--blue-quantum); color: var(--bg-dark); border-bottom-right-radius: 5px; align-self: flex-end; }
+        .chat-box { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .opts button { 
+             flex: 1 1 48%;
+             background: var(--card-dark);
+             color: var(--blue-quantum);
+             border: 1px solid var(--blue-quantum);
+             padding: 12px;
+             border-radius: 8px;
+             font-weight: 600;
+        }
+
+        /* FOOTER */
+        .footer { 
+            padding: 15px 20px; 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666; 
+            background: var(--card-dark); 
+            border-top: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+        
+        /* Erişilebilirlik Modu ve NFC Modu stilleri... */
+        body.a11y-mode { filter: grayscale(100%) invert(100%); background: white !important; color: black !important; }
+        body.a11y-mode * { color: black !important; background-color: white !important; border-color: black !important; box-shadow: none !important; }
+        body.a11y-mode .sos-btn-float { background: black !important; color: white !important; }
+        body.a11y-mode .triage-score { animation: none; } 
+        body.a11y-mode .header { border-bottom: 2px solid black !important; }
+        
+        body.nfc-mode .header { background: var(--red-alert) !important; color: white !important; border-radius: 0; }
+        body.nfc-mode .user-name { font-size: 36px !important; }
+        body.nfc-mode .triage-box { background: var(--card-dark); }
+        body.nfc-mode .triage-info span { color: white; }
+    </style>
+</head>
+<body>
+
+<div id="scr-view" class="app">
+    <div id="timer-display">⏱️ Müdahale Süresi: <span id="timer-seconds">00:00</span></div>
+    <div class="header">
+        <div id="settings-icon" onclick="Router.go('login')">⚙️</div>
+        <img id="v-img" src="" class="avatar" alt="Kullanıcı Resmi">
+        <h1 id="v-name" class="user-name">...</h1>
+        <div id="v-disease" class="risk-badge">...</div>
+    </div>
+
+    <div class="content">
+        <div class="triage-box">
+            <div class="triage-info">
+                <span id="triage-lbl">ACİL TRİAJ SKORU</span><br>
+                <small id="triage-comment">Önceliklendirme gerekli</small>
+            </div>
+            <div id="triage-score" class="triage-score">0</div>
+        </div>
+        
+        <div id="quick-actions-wrap" class="quick-actions">
+            <button onclick="Utils.toggleSiren(this); return false;" class="q-btn btn-siren">🚨 SİREN/FLAŞÖR</button>
+            <button onclick="Utils.sendLocation(this); return false;" class="q-btn btn-loc">📍 KONUM GÖNDER</button>
+            <button onclick="Utils.toggleLanguage(this); return false;" class="q-btn btn-tr">🌐 ÇEVİRİ</button>
+            <button onclick="Utils.toggleAccessibility(this); return false;" class="q-btn btn-a11y">♿ ERİŞİM MODU</button>
+        </div>
+
+        <button id="ai-btn-wrap" onclick="AI.start(); return false;" class="ai-btn">
+            🗣️ SESLİ ACİL ASİSTAN BAŞLAT
+        </button>
+
+        <div id="v-ekg-card" class="card ekg">
+            <div class="ekg-title" id="ekg-title">EKG Simülasyonu: Normal Sinüs Ritmi</div>
+            <span id="ekg-line" class="ekg-line"></span>
+        </div>
+
+        <div id="v-bmi-card" class="card bmi" style="display:none;">
+            <span class="lbl" id="lbl-bmi">⚖️ VÜCUT KİTLE ENDEKSİ (BMI)</span>
+            <div id="v-bmi-val" class="val" style="font-weight: 700;"></div>
+        </div>
+
+        <div id="v-interaction-card" class="card alert" style="display:none;">
+            <span class="lbl" style="color:var(--red-alert);">🚨 KRİTİK İLAÇ ETKİLEŞİM RİSKİ</span>
+            <div id="v-interaction-msg" class="val" style="color:var(--text-light);"></div>
+        </div>
+
+        <div id="v-allergies-card" class="card alert">
+            <span class="lbl" id="lbl-allergies" style="color:var(--red-alert);">⚠️ KRİTİK ALERJİLER</span>
+            <div id="v-allergies" class="tags"></div>
+        </div>
+
+        <div id="v-notes-card" class="card">
+            <span class="lbl" id="lbl-notes">ÖNEMLİ NOTLAR / TIBBİ UYARILAR</span>
+            <div id="v-notes" class="val">...</div>
+        </div>
+
+        <div id="v-blood-card" class="card">
+            <span class="lbl" id="lbl-blood-title">KAN GRUBU & ACİL UYUMLULUK</span>
+            <div id="v-blood-group" class="val" style="font-size: 28px; font-weight: 900; color: var(--red-alert);">...</div>
+            <div id="v-blood-compat" class="blood-grid"></div>
+        </div>
+        
+        <div id="v-meds-card" class="card">
+            <span class="lbl" id="lbl-meds">DÜZENLİ KULLANILAN İLAÇLAR</span>
+            <div id="v-meds" class="val">...</div>
+        </div>
+
+        <div id="v-doctor-card" class="card hidden" style="border-left: 5px solid var(--blue-quantum);">
+            <span class="lbl" id="lbl-doctor">HASTANIN DOKTORU</span>
+            <div class="val" id="v-doctor-info">...</div>
+        </div>
+        
+        <div id="v-family-card" class="card hidden" style="border-left: 5px solid var(--yellow-warn);">
+            <span class="lbl" id="lbl-family">AİLE İLETİŞİM (Ara/SMS)</span>
+            <div id="v-family" class="fam-list"></div>
+        </div>
+        
+        <button id="show-sensitive-btn" onclick="Security.checkBiometric(this); return false;" class="ai-btn" style="background: var(--blue-quantum); margin-top: 20px;">
+            🔒 DOKTOR/AİLE BİLGİLERİNİ GÖRÜNTÜLE
+        </button>
+    </div>
+    
+    <div id="sticky-sos-wrap" class="sticky-sos">
+        <a href="tel:112" class="sos-btn-float" onclick="this.innerHTML='📞 112 ARANIYOR...'; return true;">📞 TEK DOKUNUŞLA 112 ARA</a>
+    </div>
+
+    <div id="footer" class="footer">
+        Titan V19.0 Hyper Fix | Son Veri Güncellemesi: <span id="v-last-update">...</span>
+    </div>
+</div>
+
+<div id="scr-login" class="app hidden">
+    <div class="header" style="text-align:left; padding: 20px;"><h2>Yönetici Girişi</h2></div>
+    <div class="login-screen">
+        <p style="color:#aaa;">Verileri düzenlemek için şifrenizi girin:</p>
+        <input type="password" id="pass-in" class="input-lg" placeholder="Şifre (Örn: 01Talha55)">
+        <button onclick="Admin.check(); return false;" class="ai-btn" style="background: var(--blue-quantum); color: var(--bg-dark); margin-bottom:10px;">GİRİŞ</button>
+        <button onclick="Router.go('view'); return false;" class="ai-btn" style="background: #333; color: var(--text-light);">İPTAL</button>
+    </div>
+</div>
+
+<div id="scr-admin" class="app hidden">
+    <div class="header" style="text-align:left; padding: 20px;"><h2>⚙️ Veri Düzenle</h2></div>
+    <div class="content" style="overflow-y: auto;">
+        <div class="form-group"><span class="lbl">AD SOYAD</span><input id="i-name" class="input-lg"></div>
+        <div class="form-group"><span class="lbl">FOTO URL (Boş Bırakılabilir)</span><input id="i-img" class="input-lg" placeholder="https://..."></div>
+        
+        <div class="fam-input-group">
+            <input id="i-height" class="input-lg" placeholder="BOY (cm)" type="number">
+            <input id="i-weight" class="input-lg" placeholder="KİLO (kg)" type="number">
+        </div>
+        <div class="form-group"><span class="lbl">KAN GRUBU (Örn: A Rh+, 0 Rh-)</span><input id="i-blood" class="input-lg" placeholder="0 Rh+"></div>
+        
+        <div class="form-group"><span class="lbl">ANA TANI (RİSK)</span><select id="i-disease" class="input-lg" style="color:var(--text-light);"></select></div>
+
+        <div class="form-group" style="background:#301010; padding:15px; border:1px solid var(--red-alert); border-radius:10px;">
+            <span class="lbl" style="color:var(--red-alert);">KRİTİK ALERJİLER</span>
+            <div id="i-chk" class="chk-list"></div>
+            <input id="i-other-a" class="input-lg" placeholder="Diğer Alerjiler (Virgülle Ayırın)..." style="margin-top:10px;">
+        </div>
+
+        <div class="form-group"><span class="lbl">DÜZENLİ İLAÇLAR (Virgülle Ayırın)</span><textarea id="i-meds" class="input-lg" rows="2"></textarea></div>
+        
+        <div class="form-group"><span class="lbl">ACİL DURUM NOTLARI (Kritik!)</span><textarea id="i-notes" class="input-lg" rows="3"></textarea></div>
+
+        <span class="lbl" style="margin-top: 20px;">DOKTOR BİLGİLERİ (GİZLİ)</span>
+        <div class="fam-input-group">
+            <input id="i-doc-n" placeholder="Dr. Adı" class="input-lg">
+            <input id="i-doc-t" placeholder="Dr. Tel" type="tel" class="input-lg">
+        </div>
+
+        <span class="lbl">AİLE BİLGİLERİ (GİZLİ)</span>
+        <div class="fam-input-group">
+            <input id="i-dad-n" placeholder="Baba Adı" class="i
